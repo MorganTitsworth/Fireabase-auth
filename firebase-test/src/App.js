@@ -1,81 +1,61 @@
-import logo from "./logo.svg";
 import "./App.css";
+import { useState, useEffect } from "react";
 import {
   collection,
   addDoc,
   getDocs,
   doc,
+  setDoc,
   updateDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { db } from "./api/firebase-config";
-import { useEffect, useState } from "react";
-import { useAuth } from "./providers/AuthProvider.js";
+import { db } from "./api/firebase-config.js";
+import { useAuth } from "./providers/AuthProviders.js";
+import PostElement from "./components/Post.jsx";
+
 function App() {
+  let [post, setPost] = useState([]);
+  let [postData, setPostData] = useState({ title: "", content: "" });
   const { user, signIn, signOut } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [postData, setPostData] = useState({ title: "", content: "" });
+
+  useEffect(() => {
+    getPosts().then((posts) => setPost(posts));
+  }, []);
+
   async function getPosts() {
     try {
-      const querySnapshot = await getDocs(collection(db, "posts"));
-      const posts = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const query = await getDocs(collection(db, "posts"));
+      const posts = query.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       return posts;
-    } catch (e) {
-      console.error("Error getting posts: ", e);
+    } catch (err) {
+      console.log(err);
     }
   }
 
   async function addPost(title, content) {
     try {
-      const docRef = await addDoc(collection(db, "posts"), {
+      await addDoc(collection(db, "posts"), {
         title: title,
         content: content,
         createdAt: new Date(),
-        photo: user.photoURL,
-        uid: user.uid,
-        name: user.displayName,
+        username: user.displayName,
+        user: user.uid,
       });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
+      setPostData({ title: "", content: "" });
+    } catch (err) {
+      console.log(err);
     }
   }
-
-  async function deletePost(id) {
-    try {
-      await deleteDoc(doc(db, "posts", id));
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  useEffect(() => {
-    getPosts().then((posts) => setPosts(posts));
-  }, []);
 
   return (
     <div className="App">
-      {user ? (
-        <header className="App-header">
-          <h1>Welcome, {user.displayName}</h1>
-          <button onClick={signOut}>Sign Out</button>
-          {posts.map((post) => (
-            <div key={post.id}>
-              <div>
-                {user.uid === post.uid && <button onClick={() => deletePost(post.id)}>Delete post</button>}
-                <h3>{post.title}</h3>
-                <p>{post.content}</p>
-                <p>by: {post.name}</p>
-                <p>postID: {post.id}</p>
-              </div>
-            </div>
-          ))}
+      <header className="App-header">
+        {user ? (
           <div>
+            <p>{user.username}</p>
+            <button onClick={signOut}>Sign Out</button>
             <form
-              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+              style={{ display: "flex", flexDirection: "column" }}
               onSubmit={(e) => {
                 e.preventDefault();
                 addPost(postData.title, postData.content);
@@ -83,19 +63,19 @@ function App() {
             >
               <input
                 type="text"
-                placeholder="Title"
                 value={postData.title}
                 onChange={(e) =>
                   setPostData({ ...postData, title: e.target.value })
                 }
+                placeholder="Add new post title here"
               />
               <input
                 type="text"
-                placeholder="Content"
                 value={postData.content}
                 onChange={(e) =>
                   setPostData({ ...postData, content: e.target.value })
                 }
+                placeholder="Add new post content here"
               />
               <button
                 onClick={(e) => {
@@ -103,14 +83,17 @@ function App() {
                   addPost(postData.title, postData.content);
                 }}
               >
-                Add Post
+                Add post
               </button>
             </form>
           </div>
-        </header>
-      ) : (
-        <button onClick={signIn}>Sign In</button>
-      )}
+        ) : (
+          <button onClick={signIn}>Sign in </button>
+        )}
+        {user
+          ? post.map((item) => <PostElement id={item.id} post={item} />)
+          : ""}
+      </header>
     </div>
   );
 }

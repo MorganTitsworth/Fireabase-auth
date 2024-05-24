@@ -7,16 +7,17 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCpT0KT7hlv5vUmSxL656tiVmBoTG7QYrI",
-  authDomain: "someproject-ebab8.firebaseapp.com",
-  projectId: "someproject-ebab8",
-  storageBucket: "someproject-ebab8.appspot.com",
-  messagingSenderId: "393635096152",
-  appId: "1:393635096152:web:55d9b6a96beebc157d0c2d",
+  apiKey: "AIzaSyD2t5LyDNiiqmyChTmQPMQ7SOIogAG3lzo",
+  authDomain: "auth-test-94236.firebaseapp.com",
+  projectId: "auth-test-94236",
+  storageBucket: "auth-test-94236.appspot.com",
+  messagingSenderId: "430955530507",
+  appId: "1:430955530507:web:f162f6d3f8fc88e02cfa0e",
 };
-      
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
+
 export { db, auth };
