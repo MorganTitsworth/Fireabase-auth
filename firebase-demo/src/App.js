@@ -13,6 +13,7 @@ import { db } from "./api/firebase-config";
 import { useState, useEffect } from "react";
 import PostComponent from "./components/Post";
 import { useAuth } from "./providers/AuthProvider";
+
 function App() {
   const { user, signIn, signOut } = useAuth();
   const [post, setPosts] = useState([]);
@@ -39,7 +40,7 @@ function App() {
         createAt: new Date(),
         photo: user.photoURL,
         username: user.displayName,
-        user: user.uid
+        user: user.uid,
       });
       console.log("doc is written to DB: ", docRef.id, docRef);
     } catch (e) {
@@ -50,6 +51,7 @@ function App() {
   useEffect(() => {
     getPosts().then((posts) => setPosts(posts));
   }, []);
+
   return (
     <div className="App">
       <header className="App-header">
