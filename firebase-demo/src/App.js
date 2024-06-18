@@ -1,14 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "./api/firebase-config";
 import { useState, useEffect } from "react";
 import PostComponent from "./components/Post";
